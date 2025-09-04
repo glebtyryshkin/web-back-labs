@@ -11,7 +11,10 @@ def web():
                <h1>web-сервер на flask</h1>
            </body>
            <a href="/author">author</a>
-        </html>"""
+        </html>""", 200, {
+            "X-server": "sample",
+            "Content-Type" : "text/plain; charset=utf-8"
+            }
 
 @app.route("/author")
 def author():
@@ -81,7 +84,7 @@ def created():
 </html>
 ''', 201
 
-app = Flask(__name__)
+# app = Flask(__name__)
 
 @app.errorhandler(404)
 def not_found(err):
