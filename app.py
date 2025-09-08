@@ -36,12 +36,14 @@ def author():
 
 def image():
     path = url_for("static", filename="oak.jpg")
+    style_path = url_for("static", filename="lab1.css")
     return '''
 <!doctype.html>
 <html>
     <body>
         <h1>Дуб</h1>
         <img src="''' + path + '''">
+        <link rel="stylesheet" href="''' + style_path + '''">
     </body>
 </html>'''
 
