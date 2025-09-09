@@ -66,6 +66,29 @@ def counter():
         Дата и время: ''' + str(time) + ''' <br>
         Запрошенный адрес: ''' + str(url) + ''' <br>
         Ваш IP-адрес: ''' + str(client_ip) + ''' <br>
+        <a href="/counter-cleaning">Очистить счётчик</a>
+    </body>
+</html>'''
+
+@app.route('/counter-cleaning')
+def counter_clean():
+    global count 
+    time = datetime.datetime.today()
+    url = request.url
+    client_ip = request.remote_addr
+    count = 0
+
+    return '''
+<!doctype html>
+<html>
+    <body>
+        Сброс счётчика.
+        Сколько раз вы сюда заходили: ''' + str(count) + '''
+        <hr>
+        Дата и время: ''' + str(time) + ''' <br>
+        Запрошенный адрес: ''' + str(url) + ''' <br>
+        Ваш IP-адрес: ''' + str(client_ip) + ''' <br>
+        <a href="/counter">Вернуться назад</a>
     </body>
 </html>'''
 
