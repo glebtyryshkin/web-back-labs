@@ -3,7 +3,7 @@ import datetime
 app = Flask(__name__)
 
 @app.route("/")
-@app.route("/web")
+@app.route("/lab1/web")
 def web():
     return """<!doctype html>
         <html>
@@ -16,7 +16,7 @@ def web():
             "Content-Type" : "text/plain; charset=utf-8"
             }
 
-@app.route("/author")
+@app.route("/lab1/author")
 def author():
     name = "Тырышкин Глеб Алексеевич"
     group = "ФБИ-31"
@@ -32,7 +32,7 @@ def author():
             </body>
         </html>"""
 
-@app.route("/image")
+@app.route("/lab1/image")
 
 def image():
     path = url_for("static", filename="oak.jpg")
@@ -49,7 +49,7 @@ def image():
 
 count = 0
 
-@app.route('/counter')
+@app.route('/lab1/counter')
 def counter():
     global count 
     count += 1
@@ -66,11 +66,11 @@ def counter():
         Дата и время: ''' + str(time) + ''' <br>
         Запрошенный адрес: ''' + str(url) + ''' <br>
         Ваш IP-адрес: ''' + str(client_ip) + ''' <br>
-        <a href="/counter-cleaning">Очистить счётчик</a>
+        <a href="/lab1/counter-cleaning">Очистить счётчик</a>
     </body>
 </html>'''
 
-@app.route('/counter-cleaning')
+@app.route('/lab1/counter-cleaning')
 def counter_clean():
     global count 
     time = datetime.datetime.today()
@@ -88,13 +88,13 @@ def counter_clean():
         Дата и время: ''' + str(time) + ''' <br>
         Запрошенный адрес: ''' + str(url) + ''' <br>
         Ваш IP-адрес: ''' + str(client_ip) + ''' <br>
-        <a href="/counter">Вернуться назад</a>
+        <a href="/lab1/counter">Вернуться назад</a>
     </body>
 </html>'''
 
-@app.route("/info")
+@app.route("/lab1/info")
 def info():
-    return redirect("/author")
+    return redirect("/lab1/author")
 
 
 @app.route("/created")
