@@ -165,3 +165,75 @@ def created():
 @app.errorhandler(404)
 def not_found(err):
     return "нет такой страницы", 404
+
+@app.route('/bad-request')
+def bad_request():
+    return '''
+<!doctype html>
+<html>
+    <body>
+        <h1>400 Bad Request</h1>
+        <p>Сервер не может обработать запрос из-за некорректного синтаксиса.</p>
+    </body>
+</html>
+''', 400
+
+@app.route('/unauthorized')
+def unauthorized():
+    return '''
+<!doctype html>
+<html>
+    <body>
+        <h1>401 Unauthorized</h1>
+        <p>Для доступа к ресурсу требуется аутентификация.</p>
+    </body>
+</html>
+''', 401
+
+@app.route('/payment-required')
+def payment_required():
+    return '''
+<!doctype html>
+<html>
+    <body>
+        <h1>402 Payment Required</h1>
+        <p>Зарезервировано для будущего использования.</p>
+    </body>
+</html>
+''', 402
+
+@app.route('/forbidden')
+def forbidden():
+    return '''
+<!doctype html>
+<html>
+    <body>
+        <h1>403 Forbidden</h1>
+        <p>Сервер понял запрос, но отказывается его авторизовать.</p>
+    </body>
+</html>
+''', 403
+
+@app.route('/method-not-allowed')
+def method_not_allowed():
+    return '''
+<!doctype html>
+<html>
+    <body>
+        <h1>405 Method Not Allowed</h1>
+        <p>Используемый метод запроса не поддерживается данным ресурсом.</p>
+    </body>
+</html>
+''', 405
+
+@app.route('/teapot')
+def teapot():
+    return '''
+<!doctype html>
+<html>
+    <body>
+        <h1>418 I'm a teapot</h1>
+        <p>Я - чайник. Не могу заваривать кофе.</p>
+    </body>
+</html>
+''', 418
