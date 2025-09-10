@@ -163,8 +163,20 @@ def created():
 # app = Flask(__name__)
 
 @app.errorhandler(404)
+
 def not_found(err):
-    return "нет такой страницы", 404
+    
+    path = url_for("static", filename="2725947.jpg")
+    style_path = url_for("static", filename="lab1.css")
+    return '''
+<!doctype.html>
+<html>
+    <body>
+        <h1>Упс... Хьюстон, у нас проблемы</h1>
+        <img src="''' + path + '''">
+        <link rel="stylesheet" href="''' + style_path + '''">
+    </body>
+</html>'''
 
 @app.route('/bad-request')
 def bad_request():
