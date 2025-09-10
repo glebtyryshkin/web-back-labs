@@ -249,3 +249,19 @@ def teapot():
     </body>
 </html>
 ''', 418
+
+@app.route("/cause-error")
+def caurse_error():
+    return 1/0
+
+@app.errorhandler(500)
+def internal_error(error):
+    return """
+<!doctype html>
+<html>
+    <body>
+        <h1>Ой-ой, 500 - внутренняя ошибка сервера.<h1>
+        <p>Что-то пошло не так... Попробуйте вернуться на <a href="/">главную</a>.</p>
+    </body>
+</html>
+""", 500
