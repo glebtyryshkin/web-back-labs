@@ -96,7 +96,12 @@ def image():
         <img src="''' + path + '''">
         <link rel="stylesheet" href="''' + style_path + '''">
     </body>
-</html>'''
+</html>''', 200, {
+        "Content-Language": "ru",
+        "X-Custom-Header": "CustomValue",
+        "X-Another-Header": "AnotherValue",
+        "Content-Type": "text/html; charset=utf-8"
+    }
 
 count = 0
 
