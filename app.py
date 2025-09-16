@@ -61,7 +61,8 @@ def lab1():
         <li><a href="/bad-request">400</a></li>
         <li><a href="/unauthorized">401</a></li>
         <li><a href="/payment-required">402</a></li>
-        <li><a href="/forbidden">403</a></li>
+        <li><a href="/forbidden">403</a></li>s
+        <li><a href="/method-not-allowed">405</a></li>
         <li><a href="/teapot">418 Чайник</a></li>
         <li><a href="/cause-error">Делим на ноль</a></li>
     </body>
