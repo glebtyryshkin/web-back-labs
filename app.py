@@ -50,6 +50,20 @@ def lab1():
 
         </main>
         <a href="/">На главную</a>
+        <h2>Список роутов</h2>
+        <li><a href="/lab1/web">WEB</a></li>
+        <li><a href="/lab1/author">Автор</a></li>
+        <li><a href="/lab1/image">Картинка</a></li>
+        <li><a href="/lab1/counter">Счётчик</a></li>
+        <li></lab1/counter-cleaning">Очистка счётчика</a></li>
+        <li><a href="/lab1/info">Инфа</a></li>
+        <li><a href="/created">Создали</a></li>
+        <li><a href="/bad-request">400</a></li>
+        <li><a href="/unauthorized">401</a></li>
+        <li><a href="/payment-required">402</a></li>
+        <li><a href="/forbidden">403</a></li>
+        <li><a href="/teapot">418 Чайник</a></li>
+        <li><a href="/cause-error">Делим на ноль</a></li>
     </body>
 </html>
 """
