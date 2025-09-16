@@ -181,12 +181,20 @@ def created():
 
 # app = Flask(__name__)
 
+logs = []
+
 @app.errorhandler(404)
 
 def not_found(err):
-    
+    global logs
     path = url_for("static", filename="2725947.jpg")
     style_path = url_for("static", filename="lab1.css")
+    time = str(datetime.datetime.now())
+    client_ip = request.remote_addr
+    url = request.url
+    log_entry = f"{time}, пользователь {client_ip} зашел на адрес {url}"
+    logs.append(log_entry)
+    log_display = "\n".join(logs)
     return '''
 <!doctype.html>
 <html>
@@ -194,8 +202,13 @@ def not_found(err):
         <h1>Упс... Хьюстон, у нас проблемы</h1>
         <img src="''' + path + '''">
         <link rel="stylesheet" href="''' + style_path + '''">
+        <h2>Ваш IP-адрес: ''' + client_ip + '''</h2>
+        <h2>Дата доступа: ''' + time + '''</h2>
+        <a href="/">На главную</a>
+        <h2>Лог:</h2>
+        <pre>''' + log_display + '''</pre>
     </body>
-</html>'''
+</html>''', 404
 
 @app.route('/bad-request')
 def bad_request():
