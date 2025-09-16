@@ -1,9 +1,12 @@
-from flask import Flask, url_for, request, redirect
 import datetime
+
+from flask import Flask, url_for, request, redirect
+
 app = Flask(__name__)
 
-@app.route("/")
-@app.route("/index")
+@app.route('/')
+@app.route('/index')
+
 def index():
     return """
 <!doctype html>
@@ -28,6 +31,7 @@ def index():
 """
 
 @app.route("/lab1")
+
 
 def lab1():
     return """
@@ -70,6 +74,7 @@ def lab1():
 """
 
 @app.route("/lab1/web")
+
 def web():
     return """<!doctype html>
         <html>
@@ -83,6 +88,7 @@ def web():
             }
 
 @app.route("/lab1/author")
+
 def author():
     name = "Тырышкин Глеб Алексеевич"
     group = "ФБИ-31"
@@ -99,6 +105,7 @@ def author():
         </html>"""
 
 @app.route("/lab1/image")
+
 
 def image():
     path = url_for("static", filename="oak.jpg")
@@ -121,6 +128,7 @@ def image():
 count = 0
 
 @app.route('/lab1/counter')
+
 def counter():
     global count 
     count += 1
@@ -142,6 +150,7 @@ def counter():
 </html>'''
 
 @app.route('/lab1/counter-cleaning')
+
 def counter_clean():
     global count 
     time = datetime.datetime.today()
@@ -164,11 +173,13 @@ def counter_clean():
 </html>'''
 
 @app.route("/lab1/info")
+
 def info():
     return redirect("/lab1/author")
 
 
 @app.route("/created")
+
 def created():
     return '''
 <! doctype html>
@@ -185,6 +196,7 @@ def created():
 logs = []
 
 @app.errorhandler(404)
+
 
 def not_found(err):
     global logs
@@ -212,6 +224,7 @@ def not_found(err):
 </html>''', 404
 
 @app.route('/bad-request')
+
 def bad_request():
     return '''
 <!doctype html>
@@ -224,6 +237,7 @@ def bad_request():
 ''', 400
 
 @app.route('/unauthorized')
+
 def unauthorized():
     return '''
 <!doctype html>
@@ -236,6 +250,7 @@ def unauthorized():
 ''', 401
 
 @app.route('/payment-required')
+
 def payment_required():
     return '''
 <!doctype html>
@@ -248,6 +263,7 @@ def payment_required():
 ''', 402
 
 @app.route('/forbidden')
+
 def forbidden():
     return '''
 <!doctype html>
@@ -260,6 +276,7 @@ def forbidden():
 ''', 403
 
 @app.route('/method-not-allowed')
+
 def method_not_allowed():
     return '''
 <!doctype html>
@@ -272,6 +289,7 @@ def method_not_allowed():
 ''', 405
 
 @app.route('/teapot')
+
 def teapot():
     return '''
 <!doctype html>
@@ -284,17 +302,20 @@ def teapot():
 ''', 418
 
 @app.route("/cause-error")
+
 def caurse_error():
     return 1/0
 
 @app.errorhandler(500)
+
 def internal_error(error):
     return """
 <!doctype html>
 <html>
     <body>
         <h1>Ой-ой, 500 - внутренняя ошибка сервера.<h1>
-        <p>Что-то пошло не так... Попробуйте вернуться на <a href="/">главную</a>.</p>
+        <p>Что-то пошло не так... Попробуйте вернуться на <a
+            href="/">главную</a>.</p>
     </body>
 </html>
 """, 500
