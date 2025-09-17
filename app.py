@@ -1,6 +1,6 @@
 import datetime
 
-from flask import Flask, url_for, request, redirect, abort
+from flask import Flask, url_for, request, redirect, abort, render_template
 
 app = Flask(__name__)
 
@@ -352,4 +352,7 @@ def add_flower(name):
 </html>
 '''
 
+@app.route('/lab2/example')
+def example():
+    return render_template('example.html')
 
