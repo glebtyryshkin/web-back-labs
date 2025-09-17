@@ -319,3 +319,11 @@ def internal_error(error):
     </body>
 </html>
 """, 500
+
+@app.route('/lab2/a/')
+def a():
+    return 'ok'
+
+@app.route('/lab2/a')
+def a_mod():
+    return 'not ok'
