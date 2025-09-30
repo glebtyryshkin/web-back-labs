@@ -361,11 +361,14 @@ def example():
     fruits = [
         {'name': 'яблоки', 'price': 100},
         {'name': 'груши', 'price': 120},
-        {'name': 'anenьcины', 'price': 80},
+        {'name': 'aneльcины', 'price': 80},
         {'name': 'мандарины', 'price': 95},
-        {'name': 'MaHro', 'price': 321}
+        {'name': 'Maнгo', 'price': 321}
     ]
     return render_template('example.html', 
                            name=name, group_num=group_num, 
                            course_num=course_num, lab_num=lab_num, fruits=fruits)
 
+@app.route('/lab2/')
+def lab2():
+    return render_template('lab2.html')
