@@ -422,3 +422,19 @@ def calc_default():
 @app.route('/lab2/calc/<int:a>')
 def calc_one(a):
     return redirect(f'/lab2/calc/{a}/1')
+
+@app.route('/lab2/books')
+def books_route():
+    books = [
+        {'author': 'Лев Толстой', 'title': 'Война и мир', 'genre': 'Роман', 'pages': 1225},
+        {'author': 'Фёдор Достоевский', 'title': 'Преступление и наказание', 'genre': 'Роман', 'pages': 671},
+        {'author': 'Джейн Остин', 'title': 'Гордость и предубеждение', 'genre': 'Роман', 'pages': 432},
+        {'author': 'Джордж Орвелл', 'title': '1984', 'genre': 'Дистопия', 'pages': 328},
+        {'author': 'Габриэль Гарсия Маркес', 'title': 'Сто лет одиночества', 'genre': 'Магический реализм', 'pages': 417},
+        {'author': 'Фрэнсис Скотт Фицджеральд', 'title': 'Великий Гэтсби', 'genre': 'Роман', 'pages': 180},
+        {'author': 'Дж.Р.Р. Толкин', 'title': 'Властелин колец', 'genre': 'Фэнтези', 'pages': 1178},
+        {'author': 'Маргарет Митчелл', 'title': 'Унесённые ветром', 'genre': 'Роман', 'pages': 1037},
+        {'author': 'Харпер Ли', 'title': 'Убить пересмешника', 'genre': 'Роман', 'pages': 281},
+        {'author': 'Джон Стейнбек', 'title': 'Гроздья гнева', 'genre': 'Роман', 'pages': 464}
+    ]
+    return render_template('books.html', books=books)
