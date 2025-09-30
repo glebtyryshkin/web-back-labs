@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block lab %}Все цветы{% endblock %}
+{% block main %}
+<h1>Все цветы</h1>
+<p>Количество цветов: {{ flowers|length }}</p>
+<table>
+    <tr><th>Название</th><th>Цена</th><th>Действие</th></tr>
+    {% for flower in flowers %}
+    <tr>
+        <td>{{ flower.name }}</td>
+        <td>{{ flower.price }} руб.</td>
+        <td><a href="/lab2/delete_flower/{{ loop.index0 }}">удалить</a></td>
+    </tr>
+    {% endfor %}
+</table>
+<h2>Добавить новый цветок</h2>
+<form action="/lab2/add_flower/" method="post">
+    <input type="text" name="name" placeholder="Имя цветка" required>
+    <input type="number" name="price" placeholder="Цена" required>
+    <button type="submit">Добавить</button>
+</form>
+<a href="/lab2/clear_flowers/">Удалить все цветки</a>
+{% endblock %}
+

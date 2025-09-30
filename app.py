@@ -308,62 +308,52 @@ def a():
 def a_mod():
     return 'not ok'
 
-flower_list = ['роза', 'тюльпан', 'незабудка', 'ромашка']
+flower_list = [
+    {'name': 'роза', 'price': 100},
+    {'name': 'тюльпан', 'price': 50},
+    {'name': 'незабудка', 'price': 30},
+    {'name': 'ромашка', 'price': 20}
+]
 
 @app.route('/lab2/flowers/<int:flower_id>')
 def flowers(flower_id):
     if flower_id < 0 or flower_id >= len(flower_list):
         abort(404)
-    return f'''
-    <!doctype html>
-    <html>
-        <body>
-            <h1>Цветок № {flower_id + 1}</h1>
-            <p>Название: {flower_list[flower_id]}</p>
-            <a href="/lab2/all_flowers/">Смотреть все цветы</a>
-        </body>
-    </html>
-    '''
-    
-@app.route('/lab2/add_flower/<name>')
-def add_flower(name):
-    flower_list.append(name)
-    return f'''
-<!doctype html>
-<html>
-    <body>
-    <h1>Добавлен новый цветок</h1>
-    <p>Название нового цветка:  {name} </p>
-    <p>Всего цветов: {len(flower_list)}</p>
-    <p>Полный список: {flower_list}</p>
-    </body>
-</html>
-'''
+    flower = flower_list[flower_id]
+    return render_template('flower.html', flower=flower, id=flower_id)
 
-@app.route('/lab2/add_flower/')
-def add_flower_no_name():
-    abort(400, 'вы не задали имя цветка')
+@app.route('/lab2/add_flower/', methods=['POST'])
+def add_flower():
+    name = request.form.get('name')
+    price = request.form.get('price')
+    if not name or not price:
+        abort(400, 'Не заданы имя или цена')
+    try:
+        price = int(price)
+    except ValueError:
+        abort(400, 'Цена должна быть числом')
+    flower_list.append({'name': name, 'price': price})
+    return redirect('/lab2/all_flowers/')
 
 @app.route('/lab2/all_flowers/')
 def all_flowers():
-    return f'''
-    <!doctype html>
-    <html>
-        <body>
-            <h1>Все цветы</h1>
-            <p>Количество цветов: {len(flower_list)}</p>
-            <ul>
-                {"".join(f"<li>{flower}</li>" for flower in flower_list)}
-            </ul>
-            <a href="/lab2/clear_flowers/">Очистить список</a>
-        </body>
-    </html>
-    '''
+    return render_template('all_flowers.html', flowers=flower_list)
+
+@app.route('/lab2/delete_flower/<int:flower_id>')
+def delete_flower(flower_id):
+    if flower_id < 0 or flower_id >= len(flower_list):
+        abort(404)
+    del flower_list[flower_id]
+    return redirect('/lab2/all_flowers/')
 
 @app.route('/lab2/clear_flowers/')
 def clear_flowers():
     flower_list.clear()
     return redirect('/lab2/all_flowers/')
+
+@app.route('/lab2/add_flower/')
+def add_flower_no_name():
+    abort(400, 'вы не задали имя цветка')
 
 @app.route('/lab2/example')
 def example():
