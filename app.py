@@ -438,3 +438,30 @@ def books_route():
         {'author': 'Джон Стейнбек', 'title': 'Гроздья гнева', 'genre': 'Роман', 'pages': 464}
     ]
     return render_template('books.html', books=books)
+
+@app.route('/lab2/animals')
+def berries_route():
+    animals = [
+        {'name': 'Повар', 'description': 'Хомякович, любит готовить.', 'image': 'animal_1.jpg'},
+        {'name': 'Красавчик', 'description': 'Вайбик имеется.', 'image': 'animal_2.jpg'},
+        {'name': 'Скромный диджей', 'description': 'Начинающий диджей, не судите строго', 'image': 'animal_3.jpg'},
+        {'name': 'Огородник', 'description': 'Маленький чихуа-хуа любит собирать урожай', 'image': 'animal_4.jpg'},
+        {'name': 'Бобик', 'description': 'Устал и любит сидеть. Просто сидеть.', 'image': 'animal_5.jpg'},
+        {'name': 'Овечка-айтишник', 'description': 'Програет и распутывает самые запутанные истории.', 'image': 'animal_6.jpg'},
+        {'name': 'Васёк', 'description': 'Рубится в свой старый комп после работы', 'image': 'animal_7.jpg'},
+        {'name': 'Кайфарики', 'description': 'Заходят как-то в бар два котёнка...', 'image': 'animal_8.jpg'},
+        {'name': 'Скейтеры', 'description': 'Безбашенные ребята', 'image': 'animal_9.jpg'},
+        {'name': 'Пилот', 'description': 'Летает на Миг-29. Гроза поросят', 'image': 'animal_10.jpg'},
+        {'name': 'Рыбак', 'description': 'Настраивается на крупный улов', 'image': 'animal_11.jpg'},
+        {'name': 'Подкастер', 'description': 'Идёт медведь по дороге, видит машина горит, сел в неё и сгорел', 'image': 'animal_12.jpg'},
+        {'name': 'Игрок в покер', 'description': 'Азарт - моё второе имя (первое - мяу).', 'image': 'animal_13.jpg'},
+        {'name': 'Профессиональный диджей', 'description': 'Устраивает рейвы мирового масштаба', 'image': 'animal_14.jpg'},
+        {'name': 'Офис', 'description': 'Ало, подростки? Дада СВАГА!', 'image': 'animal_15.jpg'},
+        {'name': 'Адьос-амигос', 'description': 'Покатился куда подальше', 'image': 'animal_16.jpg'},
+        {'name': 'Трюкачи', 'description': 'Фристайло, ракамакафо', 'image': 'animal_17.jpg'},
+        {'name': 'Невезучий', 'description': 'АААААааааааааа, ветер!', 'image': 'animal_18.jpg'},
+        {'name': 'Гитарист', 'description': 'Какова музыка на вкус?', 'image': 'animal_19.jpg'},
+        {'name': 'Рокер', 'description': 'Дайте людям рому!', 'image': 'animal_20.jpg'},
+        {'name': 'Эстет', 'description': 'Ловит красивые вайбы и ценит каждый момент.', 'image': 'animal_21.jpg'},
+    ]
+    return render_template('animals.html', animals=animals)
