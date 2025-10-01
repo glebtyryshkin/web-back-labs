@@ -1,8 +1,12 @@
 import datetime
 
 from flask import Flask, url_for, request, redirect, abort, render_template
+
 from lab1 import lab1
+
 from lab2 import lab2
+
+
 
 app = Flask(__name__)
 app.register_blueprint(lab1)
@@ -10,6 +14,7 @@ app.register_blueprint(lab2)
 
 @app.route('/')
 @app.route('/index')
+
 
 def index():
     return render_template('index.html')
@@ -19,16 +24,17 @@ logs = []
 @app.errorhandler(404)
 
 
+
 def not_found(err):
     global logs
-    path = url_for("static", filename="2725947.jpg")
-    style_path = url_for("static", filename="lab1.css")
+    path = url_for('static', filename='2725947.jpg')
+    style_path = url_for('static', filename='lab1.css')
     time = str(datetime.datetime.now())
     client_ip = request.remote_addr
     url = request.url
     log_entry = f"{time}, пользователь {client_ip} зашел на адрес {url}"
     logs.append(log_entry)
-    log_display = "\n".join(logs)
+    log_display = '\n'.join(logs)
     return '''
         <!doctype.html>
         <html>
@@ -46,6 +52,7 @@ def not_found(err):
 
 @app.route('/bad-request')
 
+
 def bad_request():
     return '''
 <!doctype html>
@@ -58,6 +65,7 @@ def bad_request():
 ''', 400
 
 @app.route('/unauthorized')
+
 
 def unauthorized():
     return '''
@@ -72,6 +80,7 @@ def unauthorized():
 
 @app.route('/payment-required')
 
+
 def payment_required():
     return '''
 <!doctype html>
@@ -84,6 +93,7 @@ def payment_required():
 ''', 402
 
 @app.route('/forbidden')
+
 
 def forbidden():
     return '''
@@ -98,6 +108,7 @@ def forbidden():
 
 @app.route('/method-not-allowed')
 
+
 def method_not_allowed():
     return '''
 <!doctype html>
@@ -110,6 +121,7 @@ def method_not_allowed():
 ''', 405
 
 @app.route('/teapot')
+
 
 def teapot():
     return '''
@@ -124,10 +136,12 @@ def teapot():
 
 @app.route("/cause-error")
 
+
 def caurse_error():
     return 1/0
 
 @app.errorhandler(500)
+
 
 def internal_error(error):
     return """
@@ -140,4 +154,3 @@ def internal_error(error):
     </body>
 </html>
 """, 500
-
