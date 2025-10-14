@@ -112,3 +112,76 @@ def settings():
     return render_template('lab3/settings.html',
                            color=color, bg_color=bg,
                            font_size=size, font_weight=weight)
+
+@lab3.route('/lab3/ticket')
+
+def ticket():
+    errors = {}
+    return render_template('lab3/ticket.html', errors=errors)
+
+@lab3.route('/lab3/ticket_result')
+
+def ticket_result():
+
+
+    fio = request.args.get('fio')
+    shelf = request.args.get('shelf')
+    linen = request.args.get('linen')
+    luggage = request.args.get('luggage')
+    age = request.args.get('age')
+    departure = request.args.get('departure')
+    destination = request.args.get('destination')
+    date = request.args.get('date')
+    insurance = request.args.get('insurance')
+    
+    errors = {}
+    if not fio:
+        errors['fio'] = "Заполните поле"
+    if not shelf:
+        errors['shelf'] = "Выберите полку"
+    if not age:
+        errors['age'] = "Заполните поле"
+    elif not age.isdigit() or int(age) < 1 or int(age) > 120:
+        errors['age'] = "Возраст должен быть от 1 до 120 лет"
+    if not departure:
+        errors['departure'] = "Заполните поле"
+    if not destination:
+        errors['destination'] = "Заполните поле"
+    if not date:
+        errors['date'] = "Выберите дату"
+    
+    if errors:
+        return render_template('lab3/ticket.html', 
+                             errors=errors,
+                             fio=fio or '',
+                             age=age or '',
+                             departure=departure or '',
+                             destination=destination or '',
+                             date=date or '')
+    
+
+    price = 700 if int(age) < 18 else 1000
+    
+    if shelf in ['lower', 'side_lower']:
+        price += 100
+    if linen == 'on':
+        price += 75
+    if luggage == 'on':
+        price += 250
+    if insurance == 'on':
+        price += 150
+    
+    ticket_type = "Детский билет" if int(age) < 18 else "Взрослый билет"
+    
+    return render_template('lab3/ticket_result.html',
+                         fio=fio,
+                         shelf=shelf,
+                         linen=linen,
+                         luggage=luggage,
+                         age=age,
+                         departure=departure,
+                         destination=destination,
+                         date=date,
+                         insurance=insurance,
+                         price=price,
+                         ticket_type=ticket_type)
