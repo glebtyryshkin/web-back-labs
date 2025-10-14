@@ -199,3 +199,82 @@ def clear_settings():
     
     return resp
     
+PRODUCTS = [
+    {"name": "Harley Benton EX-84 Modern EMG", "price": 60000, "brand": "Harley Benton", "type": "Эксплорер", "pickups": "EMG 81/60"},
+    {"name": "Fender Player Stratocaster", "price": 85000, "brand": "Fender", "type": "Стратокастер", "pickups": "Single x3"},
+    {"name": "Epiphone Les Paul Standard", "price": 55000, "brand": "Epiphone", "type": "Лес Пол", "pickups": "Humbucker x2"},
+    {"name": "Ibanez RG421", "price": 48000, "brand": "Ibanez", "type": "Superstrat", "pickups": "Quantum"},
+    {"name": "Squier Classic Vibe Strat", "price": 45000, "brand": "Squier", "type": "Стратокастер", "pickups": "Single x3"},
+    {"name": "Jackson JS22 Dinky", "price": 38000, "brand": "Jackson", "type": "Superstrat", "pickups": "Humbucker x2"},
+    {"name": "Yamaha Pacifica 112V", "price": 35000, "brand": "Yamaha", "type": "Стратокастер", "pickups": "HSS"},
+    {"name": "ESP LTD EC-256", "price": 52000, "brand": "ESP", "type": "Лес Пол", "pickups": "Humbucker x2"},
+    {"name": "Gibson Les Paul Studio", "price": 120000, "brand": "Gibson", "type": "Лес Пол", "pickups": "490R/498T"},
+    {"name": "PRS SE Custom 24", "price": 75000, "brand": "PRS", "type": "PRS", "pickups": "Humbucker x2"},
+    {"name": "Cort X100", "price": 28000, "brand": "Cort", "type": "Superstrat", "pickups": "Humbucker x2"},
+    {"name": "Dean Vendetta XM", "price": 22000, "brand": "Dean", "type": "Superstrat", "pickups": "Humbucker x2"},
+    {"name": "Schecter Omen Extreme", "price": 65000, "brand": "Schecter", "type": "Superstrat", "pickups": "Diamond Plus"},
+    {"name": "Gretsch G2622 Streamliner", "price": 58000, "brand": "Gretsch", "type": "Полуакустика", "pickups": "Broad'Tron"},
+    {"name": "Sterling by Music Man Cutlass", "price": 72000, "brand": "Sterling", "type": "Стратокастер", "pickups": "Single x3"},
+    {"name": "Epiphone SG Standard", "price": 42000, "brand": "Epiphone", "type": "SG", "pickups": "Humbucker x2"},
+    {"name": "Ibanez GRG121DX", "price": 32000, "brand": "Ibanez", "type": "Superstrat", "pickups": "Humbucker x2"},
+    {"name": "Harley Benton SC-450", "price": 18000, "brand": "Harley Benton", "type": "Лес Пол", "pickups": "Humbucker x2"},
+    {"name": "Fender American Professional Strat", "price": 150000, "brand": "Fender", "type": "Стратокастер", "pickups": "V-Mod Single"},
+    {"name": "Gibson Explorer", "price": 140000, "brand": "Gibson", "type": "Эксплорер", "pickups": "Humbucker x2"}
+]
+
+@lab3.route('/lab3/products')
+
+def products():
+    min_price_cookie = request.cookies.get('min_price', '')
+    max_price_cookie = request.cookies.get('max_price', '')
+    
+    min_price_form = request.args.get('min_price', '')
+    max_price_form = request.args.get('max_price', '')
+    
+    min_price = min_price_form if min_price_form != '' else min_price_cookie
+    max_price = max_price_form if max_price_form != '' else max_price_cookie
+    
+    if request.args.get('reset'):
+        min_price = ''
+        max_price = ''
+    
+    all_prices = [p['price'] for p in PRODUCTS]
+    min_all_price = min(all_prices)
+    max_all_price = max(all_prices)
+    
+    filtered_products = []
+    if min_price or max_price:
+        min_val = int(min_price) if min_price else 0
+        max_val = int(max_price) if max_price else float('inf')
+        
+        if min_price and max_price and min_val > max_val:
+            min_val, max_val = max_val, min_val
+            min_price, max_price = max_price, min_price
+        
+        for product in PRODUCTS:
+            price = product['price']
+            if (not min_price or price >= min_val) and (not max_price or price <= max_val):
+                filtered_products.append(product)
+    else:
+        filtered_products = PRODUCTS
+    
+    resp = make_response(render_template(
+        'lab3/products.html',
+        products=filtered_products,
+        min_price=min_price,
+        max_price=max_price,
+        min_all_price=min_all_price,
+        max_all_price=max_all_price,
+        count=len(filtered_products)
+    ))
+    
+    if not request.args.get('reset'):
+        if min_price:
+            resp.set_cookie('min_price', min_price)
+        if max_price:
+            resp.set_cookie('max_price', max_price)
+    else:
+        resp.set_cookie('min_price', '', max_age=0)
+        resp.set_cookie('max_price', '', max_age=0)
+    
+    return resp

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block lab %}Лабораторная работа 3{% endblock %}
+
+{% block main %}
+    <div class="products-container">
+        <h1>🎸 Поиск электрогитар</h1>
+        
+        <form class="search-form">
+            <div class="price-inputs">
+                <div class="input-group">
+                    <label>Минимальная цена:</label>
+                    <input type="number" name="min_price" value="{{ min_price }}" 
+                           placeholder="{{ min_all_price }} (мин. цена)">
+                </div>
+                
+                <div class="input-group">
+                    <label>Максимальная цена:</label>
+                    <input type="number" name="max_price" value="{{ max_price }}" 
+                           placeholder="{{ max_all_price }} (макс. цена)">
+                </div>
+            </div>
+            
+            <div class="form-buttons">
+                <button type="submit" name="search" class="btn-search">🔍 Искать</button>
+                <button type="submit" name="reset" value="1" class="btn-reset">🔄 Сброс</button>
+            </div>
+        </form>
+        
+        <div class="results-info">
+            {% if min_price or max_price %}
+                <h3>Найдено гитар: {{ count }}</h3>
+                {% if min_price and max_price %}
+                    <p>Цена от {{ min_price }} до {{ max_price }} руб.</p>
+                {% elif min_price %}
+                    <p>Цена от {{ min_price }} руб.</p>
+                {% elif max_price %}
+                    <p>Цена до {{ max_price }} руб.</p>
+                {% endif %}
+            {% else %}
+                <h3>Все гитары: {{ count }}</h3>
+            {% endif %}
+        </div>
+        
+        {% if count > 0 %}
+            <div class="products-list">
+                {% for product in products %}
+                    <div class="product-item {% if 'Harley Benton EX-84' in product.name %}highlight{% endif %}">
+                        <div class="product-header">
+                            <span class="product-name">{{ product.name }}</span>
+                            <span class="product-price">{{ product.price }} руб.</span>
+                        </div>
+                        <div class="product-details">
+                            <span>Бренд: {{ product.brand }}</span>
+                            <span>Форма: {{ product.type }}</span>
+                            <span>Звукосниматели: {{ product.pickups }}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-products">
+                <h3>😞 Не найдено ни одной гитары</h3>
+                <p>Попробуйте изменить диапазон цен</p>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
