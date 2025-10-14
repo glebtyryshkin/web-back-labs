@@ -20,7 +20,7 @@ app.register_blueprint(lab3)
 
 
 def index():
-    return render_template('index.html')
+    return render_template('/lab2/index.html')
 
 logs = []
 
@@ -30,8 +30,8 @@ logs = []
 
 def not_found(err):
     global logs
-    path = url_for('static', filename='2725947.jpg')
-    style_path = url_for('static', filename='lab1.css')
+    path = url_for('static', filename='/lab1/2725947.jpg')
+    style_path = url_for('static', filename='/lab1/lab1.css')
     time = str(datetime.datetime.now())
     client_ip = request.remote_addr
     url = request.url

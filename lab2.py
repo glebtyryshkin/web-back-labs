@@ -29,7 +29,7 @@ def flowers(flower_id):
     if flower_id < 0 or flower_id >= len(flower_list):
         abort(404)
     flower = flower_list[flower_id]
-    return render_template('flower.html', flower=flower, id=flower_id)
+    return render_template('/lab2/flower.html', flower=flower, id=flower_id)
 
 @lab2.route('/lab2/add_flower/', methods=['POST'])
 
@@ -48,7 +48,7 @@ def add_flower():
 @lab2.route('/lab2/all_flowers/')
 
 def all_flowers():
-    return render_template('all_flowers.html', flowers=flower_list)
+    return render_template('/lab2/all_flowers.html', flowers=flower_list)
 
 @lab2.route('/lab2/delete_flower/<int:flower_id>')
 
@@ -83,25 +83,25 @@ def example():
         {'name': 'мандарины', 'price': 95},
         {'name': 'Maнгo', 'price': 321}
     ]
-    return render_template('example.html', 
+    return render_template('/lab2/example.html', 
                            name=name, group_num=group_num, 
                            course_num=course_num, lab_num=lab_num, fruits=fruits)
 
 @lab2.route('/lab2/')
 
 def lab():
-    return render_template('lab2.html')
+    return render_template('/lab2/lab2.html')
 
 @lab2.route('/lab2/filters')
 
 def filters():
     phrase = "О <b>сколько</b> <u>нам</u> <i>открытий</i> чудных..."
-    return render_template('filter.html', phrase = phrase)
+    return render_template('/lab2/filter.html', phrase = phrase)
 
 @lab2.route('/lab2/calc/<int:a>/<int:b>')
 
 def calc(a, b):
-    return render_template('calc.html', a=a, b=b)
+    return render_template('/lab2/calc.html', a=a, b=b)
 
 @lab2.route('/lab2/calc/')
 
@@ -128,7 +128,7 @@ def books_route():
         {'author': 'Харпер Ли', 'title': 'Убить пересмешника', 'genre': 'Роман', 'pages': 281},
         {'author': 'Джон Стейнбек', 'title': 'Гроздья гнева', 'genre': 'Роман', 'pages': 464}
     ]
-    return render_template('books.html', books=books)
+    return render_template('/lab2/books.html', books=books)
 
 @lab2.route('/lab2/animals')
 def berries_route():
@@ -155,4 +155,4 @@ def berries_route():
         {'name': 'Рокер', 'description': 'Дайте людям рому!', 'image': 'animal_20.jpg'},
         {'name': 'Эстет', 'description': 'Ловит красивые вайбы и ценит каждый момент.', 'image': 'animal_21.jpg'},
     ]
-    return render_template('animals.html', animals=animals)
+    return render_template('/lab2/animals.html', animals=animals)
