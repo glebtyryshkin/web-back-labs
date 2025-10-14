@@ -59,3 +59,68 @@ a:hover {
     border-radius: 3px;
     display: inline-block;
 }
+
+:root {
+    --main-bg-color: #fff9e6;
+    --accent-1: #ff6b6b;
+    --accent-2: #4ecdc4;
+    --text-color: #333;
+}
+
+body {
+    background-color: var(--main-bg-color);
+    font-family: 'Comic Neue', cursive;
+    color: var(--text-color);
+}
+
+.order-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 2px dashed var(--accent-1);
+}
+
+.section h3 {
+    color: var(--accent-2);
+    border-bottom: 3px wavy var(--accent-1);
+    padding-bottom: 0.5rem;
+}
+
+.option-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    margin-bottom: 10px;
+    background: #f8f8f8;
+    border-radius: 12px;
+    border: 2px solid #ddd;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.option-item:hover {
+    border-color: var(--accent-2);
+    background: #f0fffe;
+    transform: translateY(-2px);
+}
+
+.submit-btn {
+    background: linear-gradient(to bottom, var(--accent-1), #ff5252);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #c33c3c;
+    transition: all 0.2s;
+    font-weight: bold;
+}
+
+.submit-btn:hover {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #c33c3c;
+}
