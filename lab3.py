@@ -185,3 +185,17 @@ def ticket_result():
                          insurance=insurance,
                          price=price,
                          ticket_type=ticket_type)
+
+@lab3.route('/lab3/clear_settings')
+
+def clear_settings():
+
+    resp = make_response(redirect('/lab3/settings'))
+    
+    resp.set_cookie('color', '', max_age=0)
+    resp.set_cookie('bg_color', '', max_age=0)
+    resp.set_cookie('font_size', '', max_age=0)
+    resp.set_cookie('font_weight', '', max_age=0)
+    
+    return resp
+    
