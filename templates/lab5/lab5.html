@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block lab %}Лабораторная работа 5{% endblock %}
+
+{% block main %}
+    
+    <h1>База знаний</h1>
+
+    <style>
+        .nav-link {
+            margin: 0 10px;
+            color: #007BFF;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-link:hover {
+            background-color: #e6f7ff;
+            text-decoration: underline;
+        }
+    </style>
+
+    <div style="margin: 20px 0; padding: 10px; background-color: #e6f7ff; text-align: center;"> 
+        <a href="/lab5/login" class="nav-link">Вход</a>
+        <a href="/lab4/register" class="nav-link">Регистрация</a>
+        <a href="/lab5/list" class="nav-link">Список статей</a>
+        <a href="/lab5/create" class="nav-link">Создать статью</a>
+        {{ name }} 
+    </div>
+
+    <div></div>
+{% endblock %}
