@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block lab %}Лабораторная работа 4. Список пользователей{% endblock %}
+
+{% block main %}
+    <h1>Список пользователей</h1>
+    
+    {% if current_user %}
+        <div style="margin-bottom: 20px;">
+            <p>Вы вошли как: <strong>{{ current_user.name }}</strong> ({{ current_user.login }})</p>
+            
+            <form action="/lab4/users/delete_self" method="post" style="display: inline;">
+                <button type="submit" onclick="return confirm('Вы уверены, что хотите удалить свой аккаунт?')">
+                    Удалить свой аккаунт
+                </button>
+            </form>
+            
+            <a href="/lab4/users/edit_self" style="margin-left: 10px;">
+                <button>Редактировать свои данные</button>
+            </a>
+        </div>
+    {% endif %}
+    
+    <table border="1" style="border-collapse: collapse; width: 100%;">
+        <thead>
+            <tr>
+                <th>Имя</th>
+                <th>Логин</th>
+                <th>Пол</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.name }}</td>
+                <td>{{ user.login }}</td>
+                <td>
+                    {% if user.gender == 'male' %}
+                        Мужской
+                    {% else %}
+                        Женский
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div style="margin-top: 20px;">
+        <a href="/lab4">Назад к лабораторной работе 4</a>
+    </div>
+{% endblock %}
