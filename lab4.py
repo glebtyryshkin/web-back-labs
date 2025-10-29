@@ -215,3 +215,59 @@ def fridge():
                          message=message, 
                          snowflakes=snowflakes, 
                          temperature=temperature)
+
+@lab4.route('/lab4/grain_order', methods=['GET', 'POST'])
+
+def grain_order():
+    grain_types = {
+        'barley': {'name': 'ячмень', 'price': 12000},
+        'oats': {'name': 'овёс', 'price': 8500},
+        'wheat': {'name': 'пшеница', 'price': 9000},
+        'rye': {'name': 'рожь', 'price': 15000}
+    }
+    
+    message = ''
+    order_details = {}
+    error = ''
+    
+    if request.method == 'POST':
+        grain_type = request.form.get('grain_type')
+        weight_str = request.form.get('weight')
+        
+        if not grain_type:
+            error = 'Выберите тип зерна'
+        elif not weight_str:
+            error = 'Не указан вес'
+        else:
+            try:
+                weight = float(weight_str)
+                if weight <= 0:
+                    error = 'Вес должен быть положительным числом'
+                elif weight > 100:
+                    error = 'Такого объёма сейчас нет в наличии'
+                else:
+
+                    grain_info = grain_types[grain_type]
+                    base_price = grain_info['price']
+                    total = base_price * weight
+                    
+                    discount = 0
+                    if weight > 10:
+                        discount = total * 0.1
+                        total -= discount
+                    
+                    order_details = {
+                        'grain_name': grain_info['name'],
+                        'weight': weight,
+                        'total': total,
+                        'discount': discount,
+                        'has_discount': discount > 0
+                    }
+                    
+            except ValueError:
+                error = 'Введите корректное числовое значение веса'
+    
+    return render_template('lab4/grain_order.html', 
+                         grain_types=grain_types,
+                         order_details=order_details,
+                         error=error)
