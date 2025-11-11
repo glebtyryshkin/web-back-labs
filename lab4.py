@@ -236,7 +236,6 @@ def edit_self():
     if not name:
         errors.append('Не введено имя')
     
-    # Проверка уникальности логина (кроме текущего пользователя)
     for user in users:
         if user['login'] == login and user['login'] != current_user['login']:
             errors.append('Пользователь с таким логином уже существует')
