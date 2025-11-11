@@ -25,10 +25,10 @@
 
     <div style="margin: 20px 0; padding: 10px; background-color: #e6f7ff; text-align: center;"> 
         <a href="/lab5/login" class="nav-link">Вход</a>
-        <a href="/lab4/register" class="nav-link">Регистрация</a>
+        <a href="/lab5/register" class="nav-link">Регистрация</a>
         <a href="/lab5/list" class="nav-link">Список статей</a>
         <a href="/lab5/create" class="nav-link">Создать статью</a>
-        {{ name }} 
+        {% if login %}{{ login }}{% else %}Anonymous{% endif %}
     </div>
 
     <div></div>
