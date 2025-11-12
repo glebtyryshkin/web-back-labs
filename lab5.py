@@ -1,4 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, session
+from flask import Blueprint, render_template, request, redirect, session, current_app
+
+import sqlite3
+
+from os import path
 
 import psycopg2
 
@@ -14,14 +18,22 @@ def lab():
     return render_template('lab5/lab5.html', login = session.get('login'))
 
 def db_connect():
-    conn = psycopg2.connect(
-        host = '127.0.0.1',
-        database = 'gleb_tyryshkin_knowledge_base',
-        user = 'gleb_tyryshkin_knowledge_base',
-        password = 'glebtyryshkin'
-    )
+    if current_app.config['DB_TYPE'] == 'postgres':
+        conn = psycopg2.connect(
+            host = '127.0.0.1',
+            database = 'gleb_tyryshkin_knowledge_base',
+            user = 'gleb_tyryshkin_knowledge_base',
+            password = 'glebtyryshkin'
+        )
 
-    cur = conn.cursor(cursor_factory= RealDictCursor)
+        cur = conn.cursor(cursor_factory= RealDictCursor)
+
+    else:
+        dir_path = path.dirname(path.realpath(__file__))
+        db_path = path.join(dir_path, 'database.db')
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
 
     return conn, cur
 
@@ -142,3 +154,4 @@ def list():
 
     db_close(conn, cur)
     return render_template ('lab5/articles.html', articles=articles)
+
