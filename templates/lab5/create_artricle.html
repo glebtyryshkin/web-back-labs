@@ -6,19 +6,20 @@
     <h1>Создание статьи</h1>
 
     <form method="post">
-        <div>
-            <label>
-                Название статьи:
-                <input type="text" maxlength="50">
-            </label>
-        </div>
+    <div>
+        <label>
+        Название статьи:
+        <input type="text" name="title" maxlength="50">
+        </label>
+    </div>
 
-        <div>
-            <textarea name="article_test"></textarea>
-        </div>
+    <div>
+        <textarea name="article_text"></textarea>
+    </div>
 
-        <div>
-            <button type="submit">Готово</button>
-        </div>
+    <div>
+        <button type="submit">Готово</button>
+    </div>
     </form>
+
 {% endblock %}
