@@ -120,19 +120,6 @@ def login():
     conn.close()
     return render_template('lab5/succes_login.html', login=login)
     
-@lab5.route('/lab5/create', methods=['GET', 'POST'])
-def column_exists(cur, db_type, table, column):
-    if db_type == 'postgres':
-        cur.execute("""
-            SELECT 1 FROM information_schema.columns
-            WHERE table_name=%s AND column_name=%s;
-        """, (table, column))
-        return cur.fetchone() is not None
-    else:
-        cur.execute(f"PRAGMA table_info({table});")
-        rows = cur.fetchall()
-        # sqlite Row: rows is list of rows where row[1] is name
-        return any((r['name'] if isinstance(r, dict) else r[1]) == column for r in rows)
 
 @lab5.route('/lab5/create', methods=['GET', 'POST'])
 def create():
@@ -144,48 +131,42 @@ def create():
         return render_template('lab5/create_artricle.html')
 
     title = request.form.get('title')
-    # читаем оба варианта формы (на случай, если где-то остался старый шаблон)
-    article_text = request.form.get('article_text') or request.form.get('article_test')
+    article_text = request.form.get('article_text') or ''
 
     if not title or not article_text:
         return render_template('lab5/create_artricle.html', error='Заполните все поля!')
 
     conn, cur = db_connect()
+    db_type = current_app.config.get('DB_TYPE') or 'sqlite'
 
     # получаем id пользователя
-    if current_app.config.get('DB_TYPE') == 'postgres':
+    if db_type == 'postgres':
         cur.execute("SELECT id FROM users WHERE login=%s;", (login,))
     else:
         cur.execute("SELECT id FROM users WHERE login=?;", (login,))
-    user = cur.fetchone()
-    if not user:
+    user_row = cur.fetchone()
+
+    if not user_row:
         db_close(conn, cur)
         return redirect('/lab5/login')
-    user_id = user['id']
 
-    # выбираем, в какую колонку писать — prefer article_text
-    dbt = current_app.config.get('DB_TYPE') or 'sqlite'
-    if column_exists(cur, dbt, 'articles', 'article_text'):
-        col = 'article_text'
-    elif column_exists(cur, dbt, 'articles', 'article_test'):
-        col = 'article_test'
-    else:
-        # если ни одной колонки нет — создаём article_text (Postgres требует отдельного запроса, тут простой вариант)
-        if dbt == 'postgres':
-            cur.execute("ALTER TABLE articles ADD COLUMN article_text TEXT;")
-        else:
-            cur.execute("ALTER TABLE articles ADD COLUMN article_text TEXT;")
-        col = 'article_text'
+    user = dict(user_row)
+    user_id = user.get('id')
 
-    if dbt == 'postgres':
-        cur.execute(f"INSERT INTO articles (user_id, title, {col}) VALUES (%s, %s, %s);",
-                    (user_id, title, article_text))
+    # вставляем статью
+    if db_type == 'postgres':
+        cur.execute(
+            "INSERT INTO articles (login_id, title, article_text) VALUES (%s, %s, %s);",
+            (user_id, title, article_text)
+        )
     else:
-        cur.execute(f"INSERT INTO articles (user_id, title, {col}) VALUES (?, ?, ?);",
-                    (user_id, title, article_text))
+        cur.execute(
+            "INSERT INTO articles (login_id, title, article_text) VALUES (?, ?, ?);",
+            (user_id, title, article_text)
+        )
 
     db_close(conn, cur)
-    return redirect('/lab5')
+    return redirect('/lab5/list')
 
 
 @lab5.route('/lab5/list')
@@ -195,33 +176,28 @@ def list():
         return redirect('/lab5/login')
 
     conn, cur = db_connect()
+    db_type = current_app.config.get('DB_TYPE') or 'sqlite'
 
-    if current_app.config['DB_TYPE'] == 'postgres':
-        cur.execute("SELECT * FROM users WHERE login=%s;", (login,))
+    # получаем id пользователя
+    if db_type == 'postgres':
+        cur.execute("SELECT id FROM users WHERE login=%s;", (login,))
     else:
-        cur.execute("SELECT * FROM users WHERE login=?;", (login,))
-    user = cur.fetchone()
+        cur.execute("SELECT id FROM users WHERE login=?;", (login,))
+    user_row = cur.fetchone()
 
-    if not user:
+    if not user_row:
         db_close(conn, cur)
         return redirect('/lab5/login')
 
-    user_id = user['id']
+    user = dict(user_row)
+    user_id = user.get('id')
 
-    if current_app.config.get('DB_TYPE') == 'postgres':
-        cur.execute("SELECT * FROM articles WHERE user_id=%s ORDER BY id DESC;", (user_id,))
+    # выбираем статьи пользователя
+    if db_type == 'postgres':
+        cur.execute("SELECT * FROM articles WHERE login_id=%s ORDER BY id DESC;", (user_id,))
     else:
-        cur.execute("SELECT * FROM articles WHERE user_id=? ORDER BY id DESC;", (user_id,))
-    raw_articles = cur.fetchall()
+        cur.execute("SELECT * FROM articles WHERE login_id=? ORDER BY id DESC;", (user_id,))
+    articles = cur.fetchall()
+
     db_close(conn, cur)
-
-    articles = []
-    for a in raw_articles:
-        a_dict = dict(a)
-        text = a_dict.get('article_text') or a_dict.get('article_test') or ''
-        a_dict['article_text'] = text
-        articles.append(a_dict)
-
     return render_template('lab5/articles.html', articles=articles)
-
-
