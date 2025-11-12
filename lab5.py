@@ -45,7 +45,7 @@ def register():
     conn, cur = db_connect()
 
 
-    cur.execute(f"SELECT login FROM users WHERE login = '{login}';")
+    cur.execute("SELECT * FROM users WHERE login=%s;", (login, ))
     
     if cur.fetchone():
         db_close(conn, cur)
@@ -53,7 +53,11 @@ def register():
                                error='Пользователь с таким логином уже существует!')
 
     password_hash = generate_password_hash(password)
-    cur.execute(f"INSERT INTO users (login, password) VALUES ('{login}', '{password_hash}');")
+    cur.execute(
+        "INSERT INTO users (login, password) VALUES (%s, %s)",
+        (login, password_hash)
+)
+
 
 
     db_close(conn, cur)
@@ -73,7 +77,7 @@ def login():
     
     conn, cur = db_connect()
 
-    cur.execute(f"SELECT * FROM users WHERE login ='{login}';")
+    cur.execute("SELECT * FROM users WHERE login=%s;", (login, ))
 
     user = cur.fetchone()
 
@@ -108,11 +112,14 @@ def create():
 
     conn, cur = db_connect()
 
-    cur.execute(f"SELECT * FROM users WHERE login=%s;", (login, ))
-    user_id = cur.fetchone()["id"]
+    cur.execute("SELECT * FROM users WHERE login = %s;", (login,))
+    user = cur.fetchone()
+    user_id = user["id"]
 
-    cur.execute(f"INSERT INTO articles(user_id, title, article_test) \
-                VALUES ({user_id}, '{title}', '{article_test}');")
+    cur.execute(
+        "INSERT INTO articles (user_id, title, article_test) VALUES (%s, %s, %s)",
+        (user_id, title, article_test)
+)
 
     
     db_close(conn, cur)
@@ -127,10 +134,10 @@ def list():
     
     conn, cur = db_connect()
 
-    cur.execute(f"SELECT id FROM users WHERE login='{login}';")
+    cur.execute("SELECT * FROM users WHERE login=%s;", (login, ))
     user_id = cur.fetchone()['id']
 
-    cur.execute(f"SELECT * FROM articles WHERE user_id='{user_id}';")
+    cur.execute("SELECT * FROM articles WHERE user_id=%s;", (user_id, ))
     articles = cur.fetchall()
 
     db_close(conn, cur)
