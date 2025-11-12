@@ -131,6 +131,7 @@ def create():
     
     title = request.form.get('title')
     article_test = request.form.get('article_test')
+    article_text = article_test
 
     conn, cur = db_connect()
 
@@ -143,15 +144,27 @@ def create():
     user_id = user["id"]
 
     if current_app.config['DB_TYPE'] == 'postgres':
-        cur.execute(
-            "INSERT INTO articles (user_id, title, article_test) VALUES (%s, %s, %s)",
-            (user_id, title, article_test)
-        )
+        try:
+            cur.execute(
+                "INSERT INTO articles (user_id, title, article_test) VALUES (%s, %s, %s)",
+                (user_id, title, article_test)
+            )
+        except:
+            cur.execute(
+                "INSERT INTO articles (user_id, title, article_text) VALUES (%s, %s, %s)",
+                (user_id, title, article_test)
+            )
     else:
-        cur.execute(
-            "INSERT INTO articles (user_id, title, article_test) VALUES (?, ?, ?)",
-            (user_id, title, article_test)
-        )
+        try:
+            cur.execute(
+                "INSERT INTO articles (user_id, title, article_test) VALUES (?, ?, ?)",
+                (user_id, title, article_test)
+            )
+        except:
+            cur.execute(
+                "INSERT INTO articles (user_id, title, article_text) VALUES (?, ?, ?)",
+                (user_id, title, article_test)
+            )
 
     
     db_close(conn, cur)
