@@ -196,16 +196,17 @@ def list():
 
     conn, cur = db_connect()
 
-    if current_app.config.get('DB_TYPE') == 'postgres':
-        cur.execute("SELECT id FROM users WHERE login=%s;", (login,))
+    if current_app.config['DB_TYPE'] == 'postgres':
+        cur.execute("SELECT * FROM users WHERE login=%s;", (login,))
     else:
-        cur.execute("SELECT id FROM users WHERE login=?;", (login,))
-    user_row = cur.fetchone()
-    if not user_row:
+        cur.execute("SELECT * FROM users WHERE login=?;", (login,))
+    user = cur.fetchone()
+
+    if not user:
         db_close(conn, cur)
         return redirect('/lab5/login')
 
-    user_id = user.get('id')
+    user_id = user['id']
 
     if current_app.config.get('DB_TYPE') == 'postgres':
         cur.execute("SELECT * FROM articles WHERE user_id=%s ORDER BY id DESC;", (user_id,))
