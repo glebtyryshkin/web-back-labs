@@ -1,27 +1,25 @@
 {% extends "base.html" %}
-
 {% block lab %}Лабораторная работа 5{% endblock %}
 
 {% block main %}
-    <h1>Вход в систему</h1>
+<div class="container">
+  <h1>Вход</h1>
 
-    {% if error %}
-        <p>{{ error }}</p>
-    {% endif %}
+  {% if error %}
+    <div class="error">{{ error }}</div>
+  {% endif %}
 
-    <form action="/lab5/login" method="post">
-        <div>
-            <label>
-                Логин: <input type="text" name="login">
-            </label>
-        </div>
-
-        <div>
-            <label>
-                Пароль: <input type="password" name="password">
-            </label>
-        </div>
-
-        <button type="submit">Bxog</button>
-    </form>
+  <form method="post" action="/lab5/login" style="background:#fff; padding:12px; border-radius:10px;">
+    <div style="margin-bottom:10px;">
+      <label>Логин: <input type="text" name="login" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ddd;"></label>
+    </div>
+    <div style="margin-bottom:12px;">
+      <label>Пароль: <input type="password" name="password" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ddd;"></label>
+    </div>
+    <div>
+      <button class="submit-btn" type="submit">Войти</button>
+      <a class="submit-btn" style="background:#f3f6fb; color:#333; box-shadow:none;" href="/lab5/register">Регистрация</a>
+    </div>
+  </form>
+</div>
 {% endblock %}

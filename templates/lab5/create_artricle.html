@@ -1,25 +1,31 @@
 {% extends "base.html" %}
+{% block lab %}Лабораторная работа 5{% endblock %}
 
-{% block lab %} Лабораторная работа 5{% endblock %}
+{% block main %}
+<div class="container card">
+  <h1 style="margin-top:0;">{{ submit_text or 'Создание статьи' }}</h1>
 
-{% block main %} 
-    <h1>Создание статьи</h1>
+  {% if error %}
+    <div class="error">{{ error }}</div>
+  {% endif %}
 
-    <form method="post">
-    <div>
-        <label>
-        Название статьи:
-        <input type="text" name="title" maxlength="50">
-        </label>
+  <form method="post" action="{{ action_url or '/lab5/create' }}">
+    <div class="form-row">
+      <label>Название статьи
+        <input class="input" type="text" name="title" maxlength="50" value="{{ article.title if article else '' }}" required>
+      </label>
     </div>
 
-    <div>
-        <textarea name="article_text"></textarea>
+    <div class="form-row">
+      <label>Текст статьи
+        <textarea class="textarea" name="article_text" required>{{ article.article_text if article else '' }}</textarea>
+      </label>
     </div>
 
-    <div>
-        <button type="submit">Готово</button>
+    <div class="actions">
+      <button class="btn primary" type="submit">{{ submit_text or 'Опубликовать' }}</button>
+      <a class="btn ghost" href="/lab5/list">Отмена</a>
     </div>
-    </form>
-
+  </form>
+</div>
 {% endblock %}
