@@ -35,12 +35,14 @@ function getOfficeList() {
             const bookingButton = document.createElement('button');
             bookingButton.innerText = 'Зарезервировать';
             bookingButton.onclick = function() {booking(office.number)};
+            bookingButton.className = "btn primary";
             li.appendChild(bookingButton);
 
             if(office.tenant) {
                 const freeButton = document.createElement('button');
                 freeButton.innerText = 'Освободить';
                 freeButton.onclick = function() {cancellation(office.number)};
+                freeButton.className = "btn ghost";
                 li.appendChild(freeButton);
             }
 
@@ -144,7 +146,9 @@ document.addEventListener('DOMContentLoaded', function() {
 {% endblock %}
 
 {% block main %}
+<div class="container">
     <h1>Список кабинетов</h1>
     <ul id="office-list"></ul>
     <div id="office-sum"></div>
+</div>
 {% endblock %}

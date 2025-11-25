@@ -495,3 +495,10 @@ body {
   .actions { flex-direction:column; align-items:stretch; }
   .btn { width:100%; }
 }
+
+#office-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
