@@ -1,105 +1,115 @@
-from flask import Blueprint, render_template, request, redirect, session, abort
+from flask import Blueprint, render_template, request, abort, jsonify, current_app
+import psycopg2
+from psycopg2.extras import RealDictCursor
+import sqlite3
+from os import path
 
 lab7 = Blueprint('lab7', __name__)
+
+def db_connect():
+
+    if current_app.config.get('DB_TYPE', 'postgres') == 'postgres':
+        conn = psycopg2.connect(
+            host='127.0.0.1',
+            database='gleb_tyryshkin_knowledge_base',
+            user='gleb_tyryshkin_knowledge_base',
+            password='glebtyryshkin'
+        )
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+    else:
+        # SQLite надо доделать
+        dir_path = path.dirname(path.realpath(__file__))
+        db_path = path.join(dir_path, "database.db")
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+    return conn, cur
+
+def db_close(conn, cur):
+    conn.commit()
+    cur.close()
+    conn.close()
 
 @lab7.route('/lab7/')
 def main():
     return render_template('lab7/index.html')
 
-films = [
-    {
-        'title': 'Fight Club',
-        'title_ru': 'Бойцовский клуб',
-        'year': '1999',
-        'description': 'Культовая драма режиссёра Дэвида Финчера. Страховой агент, страдающий \
-            хронической бессонницей, встречает харизматичного Тайлера Дёрдена. Вместе они основывают \
-            тайный клуб подземных боёв, который превращается в глобальное анархистское движение.'
-    },
-    {
-        'title': 'There',
-        'title_ru': 'Туда',
-        'year': '2025',
-        'description': 'Российское комедийное роуд-муви режиссёра Ивана Петухова. \
-            Замкнутый таксист Вадим соглашается везти спонтанную и оптимистичную Веру из Москвы в Уфу. \
-            В пути на 1400 километров через пять живописных городов они открывают друг для друга миры \
-            чудес и приключений.'
-    },
-    {
-        'title': 'You are driving me crazy',
-        'title_ru': 'Сводишь с ума',
-        'year': '2025',
-        'description': 'Российская романтическая комедия режиссёра Дарьи Лебедевой. Алиса переезжает \
-            в большую квартиру в Санкт-Петербурге, где из зеркала видит параллельную реальность. Там \
-            живёт тусовщик Иван. История о поиске настоящей любви между героями из разных миров.'
-    },
-    {
-        'title': 'The Passions of Matthew',
-        'title_ru': 'Страсти по Матвею',
-        'year': '2023',
-        'description': 'Российская романтическая комедия режиссёра Сергея Ильина. Молодой алтарник \
-            Матвей мечтает стать священником, но для получения сана ему нужно жениться. Матвей ищет \
-            девушку, разделяющую его ценности, когда в его жизнь врывается дерзкая художница Агата. \
-            История о выборе между долгом и чувствами.'
-    },
-    {
-        'title': 'Peace! Friendship! Chewing Gum!',
-        'title_ru': 'Мир! Дружба! Жвачка!',
-        'year': '2020',
-        'description': 'Российский драматический сериал о взрослении подростков в лихие 90-е. \
-            История подростка Саньки Рябинина, который в 1993 году встречает соседку Женю и попадает \
-            в водоворот событий, которые меняют его жизнь. Вместе с друзьями Вовкой и Илюшей герой \
-            узнаёт о дружбе, первой любви и выборе жизненного пути.'
-    },
-]
-
 @lab7.route('/lab7/rest-api/films/', methods=['GET'])
 def get_films():
-    return films
+    conn, cur = db_connect()
+    # Сортируем по ID, чтобы порядок не прыгал
+    cur.execute("SELECT * FROM films ORDER BY id")
+    films = cur.fetchall()
+    db_close(conn, cur)
+    return jsonify(films)
 
 @lab7.route('/lab7/rest-api/films/<int:id>', methods=['GET'])
 def get_film(id):
-    if id < 0 or id >= len(films):
+    conn, cur = db_connect()
+    cur.execute("SELECT * FROM films WHERE id = %s", (id,))
+    film = cur.fetchone()
+    db_close(conn, cur)
+    
+    if film is None:
         return abort(404)
-    return films[id]
+    return jsonify(film)
 
 @lab7.route('/lab7/rest-api/films/<int:id>', methods=['DELETE'])
 def del_film(id):
-    if id < 0 or id >= len(films):
-        return abort(404)
-    del films[id]
+    conn, cur = db_connect()
+    cur.execute("DELETE FROM films WHERE id = %s", (id,))
+    db_close(conn, cur)
     return '', 204
 
 @lab7.route('/lab7/rest-api/films/<int:id>', methods=['PUT'])
 def put_film(id):
     film = request.get_json()
+    
     if film.get('description', '') == '':
         return {'description': 'Заполните описание'}, 400
     
     if film.get('title', '') == '':
         film['title'] = film.get('title_ru')
 
-    if 0 <= id < len(films):
-        films[id] = film
-        return films[id]
+    conn, cur = db_connect()
     
-    elif id == len(films):
-        films.append(film)
-        return films[id]
-        
-    else:
+    # Сначала проверяем, есть ли фильм с таким ID
+    cur.execute("SELECT id FROM films WHERE id = %s", (id,))
+    if cur.fetchone() is None:
+        db_close(conn, cur)
         return abort(404)
 
+    cur.execute("""
+        UPDATE films 
+        SET title = %s, title_ru = %s, year = %s, description = %s
+        WHERE id = %s
+        RETURNING *
+    """, (film['title'], film['title_ru'], film['year'], film['description'], id))
+    
+    updated_film = cur.fetchone()
+    db_close(conn, cur)
+    
+    return jsonify(updated_film)
 
 @lab7.route('/lab7/rest-api/films/', methods=['POST'])
 def add_film():
     film = request.get_json()
-
+    
     if film.get('description', '') == '':
         return {'description': 'Заполните описание'}, 400
 
     if film.get('title', '') == '':
         film['title'] = film.get('title_ru')
 
-    films.append(film)
-
-    return str(len(films) - 1)
+    conn, cur = db_connect()
+    cur.execute("""
+        INSERT INTO films (title, title_ru, year, description) 
+        VALUES (%s, %s, %s, %s)
+        RETURNING id
+    """, (film['title'], film['title_ru'], film['year'], film['description']))
+    
+    new_id = cur.fetchone()['id']
+    db_close(conn, cur)
+    
+    # Возвращаем ID как объект, чтобы JS мог его прочитать
+    return {'id': new_id}, 201

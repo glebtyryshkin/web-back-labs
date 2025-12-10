@@ -7,6 +7,7 @@ function fillFilmList() {
         
         let tbody = document.getElementById('film-list');
         tbody.innerHTML = '';
+        
         for (let i = 0; i < films.length; i++) {
             let tr = document.createElement('tr');
 
@@ -26,16 +27,19 @@ function fillFilmList() {
 
             tdYear.innerText = films[i].year;
 
+            // Используем реальный ID из базы данных (films[i].id), а не индекс (i)
+            let id = films[i].id; 
+
             let editButton = document.createElement('button');
             editButton.innerText = 'редактировать';
             editButton.onclick = function() {
-                editFilm(i);
+                editFilm(id);
             };
 
             let delButton = document.createElement('button');
             delButton.innerText = 'удалить';
             delButton.onclick = function() {
-                deleteFilm(i, films[i].title_ru);
+                deleteFilm(id, films[i].title_ru);
             };
 
             tdActions.append(editButton);
@@ -102,10 +106,10 @@ function editFilm(id) {
     })
     .then (function (film) {
         document.getElementById('id').value = id;
-        document.getElementById('title').value = film.title,
-        document.getElementById('title-ru').value = film.title_ru,
-        document.getElementById('year').value = film.year,
-        document.getElementById('description').value = film.description,
+        document.getElementById('title').value = film.title;
+        document.getElementById('title-ru').value = film.title_ru;
+        document.getElementById('year').value = film.year;
+        document.getElementById('description').value = film.description;
         showModal();
     });
 }
