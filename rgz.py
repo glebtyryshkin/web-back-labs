@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify, abort
+from flask import Blueprint, render_template, request, jsonify, abort, session, current_app
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
@@ -19,11 +19,12 @@ def db_close(conn, cur):
     cur.close()
     conn.close()
 
-
 @rgz.route('/rgz/')
 def index():
-    return render_template('rgz/index.html')
-
+    # Передаем в шаблон информацию, админ ли сейчас на сайте
+    # Допустим, админ - это пользователь с логином 'root'
+    is_admin = session.get('login') == 'root' 
+    return render_template('rgz/index.html', is_admin=is_admin)
 
 
 @rgz.route('/rgz/api/books/', methods=['GET'])
@@ -96,6 +97,8 @@ def get_books():
 
 @rgz.route('/rgz/api/books/', methods=['POST'])
 def add_book():
+    if session.get('login') != 'root':
+        return abort(403)
     book = request.get_json()
     conn, cur = db_connect()
     cur.execute("""
@@ -108,6 +111,9 @@ def add_book():
 
 @rgz.route('/rgz/api/books/<int:id>', methods=['DELETE'])
 def delete_book(id):
+    if session.get('login') != 'root':
+        return abort(403)
+    
     conn, cur = db_connect()
     cur.execute("DELETE FROM books WHERE id = %s", (id,))
     db_close(conn, cur)
@@ -115,6 +121,9 @@ def delete_book(id):
 
 @rgz.route('/rgz/api/books/<int:id>', methods=['PUT'])
 def update_book(id):
+    if session.get('login') != 'root':
+        return abort(403)
+    
     book = request.get_json()
     conn, cur = db_connect()
     cur.execute("""
@@ -122,4 +131,14 @@ def update_book(id):
         WHERE id=%s
     """, (book['title'], book['author'], book['pages'], book['publisher'], book['cover_url'], id))
     db_close(conn, cur)
+    return jsonify(book)
+
+@rgz.route('/rgz/api/books/<int:id>', methods=['GET'])
+def get_book(id):
+    conn, cur = db_connect()
+    cur.execute("SELECT * FROM books WHERE id = %s", (id,))
+    book = cur.fetchone()
+    db_close(conn, cur)
+    if book is None:
+        abort(404)
     return jsonify(book)

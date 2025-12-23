@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+{% block lab %}РГЗ: Библиотека{% endblock %}
+
+{% block main %}
+<div class="rgz-container">
+    <h1>Каталог книг</h1>
+    
+    <!-- Панель управления (Фильтры) -->
+    <div class="controls">
+        <div class="filters">
+            <input type="text" id="filter-title" placeholder="Название">
+            <input type="text" id="filter-author" placeholder="Автор">
+            <input type="text" id="filter-publisher" placeholder="Издательство">
+            <input type="number" id="filter-pages-min" placeholder="Стр. от" style="width: 80px;">
+            <input type="number" id="filter-pages-max" placeholder="Стр. до" style="width: 80px;">
+            <button onclick="applyFilters()">Найти</button>
+            <button onclick="clearFilters()">Сброс</button>
+        </div>
+        
+        <div class="sorting">
+            Сортировать по:
+            <select id="sort-by" onchange="applyFilters()">
+                <option value="id">По умолчанию</option>
+                <option value="title">Названию</option>
+                <option value="author">Автору</option>
+                <option value="pages">Объему</option>
+                <option value="publisher">Издательству</option>
+            </select>
+            <select id="sort-dir" onchange="applyFilters()">
+                <option value="ASC">А-Я / 0-9</option>
+                <option value="DESC">Я-А / 9-0</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Кнопка админа -->
+    {% if is_admin %}
+    <div style="margin: 20px 0;">
+        <button onclick="openModal()">+ Добавить книгу</button>
+    </div>
+    {% endif %}
+
+    <!-- Список книг -->
+    <div id="books-grid" class="books-grid" data-is-admin="{{ 'true' if is_admin else 'false' }}"></div>
+
+    <!-- Пагинация -->
+    <div class="pagination">
+        <p>Показано: <span id="count-info">0</span></p>
+        <button id="btn-next" onclick="loadNextPage()">Показать следующие 20</button>
+    </div>
+</div>
+
+<!-- Модальное окно -->
+<div class="modal" id="book-modal" style="display: none;">
+    <div class="modal-content">
+        <h3 id="modal-title">Книга</h3>
+        <input type="hidden" id="book-id">
+        <label>Название: <input type="text" id="input-title"></label>
+        <label>Автор: <input type="text" id="input-author"></label>
+        <label>Издательство: <input type="text" id="input-publisher"></label>
+        <label>Страниц: <input type="number" id="input-pages"></label>
+        <label>URL обложки: <input type="text" id="input-cover"></label>
+        
+        <div class="modal-buttons">
+            <button onclick="saveBook()">Сохранить</button>
+            <button onclick="closeModal()" style="background: #ccc;">Отмена</button>
+        </div>
+    </div>
+</div>
+
+
+    <script src="{{ url_for('static', filename='rgz/main.js') }}"></script>
+<style>
+    /* Основной контейнер */
+    .rgz-container {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        color: #333;
+    }
+
+    h1 {
+        text-align: center;
+        color: #2c3e50;
+        margin-bottom: 30px;
+    }
+
+    /* Панель управления (Фильтры) */
+    .controls {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+    }
+
+    .filters, .sorting {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .sorting {
+        border-top: 1px solid #e9ecef;
+        padding-top: 15px;
+        margin-bottom: 0;
+    }
+
+    /* Инпуты и селекты */
+    input[type="text"], input[type="number"], select {
+        padding: 8px 12px;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus {
+        border-color: #3498db;
+        outline: none;
+    }
+
+    /* Кнопки */
+    button {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        background-color: #3498db;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.1s;
+    }
+
+    button:hover {
+        background-color: #2980b9;
+    }
+
+    button:active {
+        transform: translateY(1px);
+    }
+
+    /* Красная кнопка (для удаления) */
+    button.danger {
+        background-color: #e74c3c;
+    }
+    button.danger:hover {
+        background-color: #c0392b;
+    }
+
+    /* Сетка книг */
+    .books-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 25px;
+    }
+
+    /* Карточка книги */
+    .book-card {
+        background: white;
+        border-radius: 12px;
+        padding: 15px;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: 1px solid #eee;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .book-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+    }
+
+    .book-card img {
+        width: 150px;
+        height: 220px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin: 0 auto 15px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .book-card h4 {
+        margin: 0 0 5px;
+        font-size: 16px;
+        color: #2c3e50;
+        /* Ограничение названия в 2 строки */
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .book-card p {
+        margin: 5px 0;
+        font-size: 13px;
+        color: #7f8c8d;
+    }
+
+    .book-card button {
+        margin-top: 10px;
+        width: 100%; /* Кнопки на всю ширину */
+        font-size: 13px;
+        padding: 6px;
+    }
+
+    /* Модальное окно */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.6);
+        z-index: 1000;
+        backdrop-filter: blur(4px); /* Размытие фона */
+    }
+
+    .modal-content {
+        background: white;
+        width: 400px;
+        padding: 30px;
+        margin: 80px auto;
+        border-radius: 12px;
+        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+        from { transform: translateY(-50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-content label {
+        font-weight: 600;
+        font-size: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .modal-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .modal-buttons button {
+        flex: 1;
+    }
+
+    /* Пагинация */
+    .pagination {
+        text-align: center;
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+        color: #7f8c8d;
+    }
+</style>
+
+{% endblock %}
