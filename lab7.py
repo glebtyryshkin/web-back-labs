@@ -4,6 +4,7 @@ from psycopg2.extras import RealDictCursor
 import sqlite3
 from os import path
 
+
 lab7 = Blueprint('lab7', __name__)
 
 def db_connect():
@@ -29,6 +30,25 @@ def db_close(conn, cur):
     conn.commit()
     cur.close()
     conn.close()
+
+def validate_film(film):
+    errors = {}
+    
+    if not film.get('title_ru'):
+        errors['title_ru'] = 'Заполните русское название!'
+    
+
+    year = film.get('year')
+    if not year or not (1895 <= int(year) <= 2025):
+        errors['year'] = 'Укажите год от 1895 до 2025'
+
+    desc = film.get('description', '')
+    if not desc:
+        errors['description'] = 'Заполните описание!'
+    elif len(desc) > 2000:
+        errors['description'] = 'Описание слишком длинное'
+
+    return errors
 
 @lab7.route('/lab7/')
 def main():
@@ -71,6 +91,10 @@ def put_film(id):
     if film.get('title', '') == '':
         film['title'] = film.get('title_ru')
 
+    errors = validate_film(film)
+    if errors:
+        return errors, 400
+    
     conn, cur = db_connect()
     
     # Сначала проверяем, есть ли фильм с таким ID
@@ -100,6 +124,10 @@ def add_film():
 
     if film.get('title', '') == '':
         film['title'] = film.get('title_ru')
+
+    errors = validate_film(film)
+    if errors:
+        return errors, 400
 
     conn, cur = db_connect()
     cur.execute("""
