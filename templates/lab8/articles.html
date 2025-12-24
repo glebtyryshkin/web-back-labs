@@ -3,33 +3,58 @@
 
 {% block main %}
 <div class="container">
-  <h1 style="margin-top:0;">Мои статьи</h1>
+    <h1 style="margin-top:0;">Мои статьи</h1>
 
-  {% if not articles %}
-    <div class="card">
-      У вас пока нет статей. <a href="/lab8/create/">Создать первую</a>
+    <form action="/lab8/articles/" method="get" style="margin: 12px 0; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+        <input type="text"
+            name="q"
+            placeholder="Поиск по заголовку/тексту..."
+            value="{{ q or '' }}"
+            style="padding:8px 10px; border:1px solid #cbd5e1; border-radius:8px; min-width:260px;">
+        <button type="submit" style="padding:8px 12px; border-radius:8px; border:1px solid #2563eb; background:#2563eb; color:#fff;">
+        Найти
+        </button>
+        <a href="/lab8/articles/" style="padding:8px 12px; border-radius:8px; border:1px solid #cbd5e1; background:#fff; text-decoration:none;">
+        Сбросить
+        </a>
+    </form>
+
+    {% if q %}
+        <div style="color:#6b7280; margin-bottom:10px;">
+        Результаты по запросу: <b>{{ q }}</b>
+        </div>
+    {% endif %}
+
+    {% if not articles and q %}
+        <div class="card">
+            Ничего не найдено по запросу: <b>{{ q }}</b>.
+            <a href="/lab8/articles/">Сбросить</a>
+        </div>
+    {% elif not articles %}
+        <div class="card">
+            У вас пока нет статей.
+            <a href="/lab8/create/">Создать первую</a>
+        </div>
+    {% endif %}
+
+
+    {% for article in articles %}
+        <article class="article">
+        <h2>{{ article.title }}</h2>
+        <small>id: {{ article.id }}</small>
+        <blockquote>{{ article.article_text }}</blockquote>
+
+        <div style="margin-top:10px;">
+            <a class="btn ghost" href="/lab8/edit/{{ article.id }}/">Редактировать</a>
+
+            <form action="/lab8/delete/{{ article.id }}/" method="post" style="display:inline;">
+            <button class="btn" style="background:#ff6b6b;color:#fff;border-radius:8px;border:none"
+                    type="submit" onclick="return confirm('Удалить статью?')">
+                Удалить
+            </button>
+            </form>
+        </div>
+        </article>
+    {% endfor %}
     </div>
-  {% endif %}
-
-  {% for article in articles %}
-    <article class="article">
-      <h2>{{ article.title }}</h2>
-      <small>id: {{ article.id }}</small>
-      <blockquote>{{ article.article_text }}</blockquote>
-
-      <div style="margin-top:10px;">
-        <a class="btn ghost" href="/lab8/edit/{{ article.id }}/">Редактировать</a>
-
-        <form action="/lab8/delete/{{ article.id }}/" method="post" style="display:inline;">
-          <button class="btn"
-                  style="background:#ff6b6b;color:#fff;border-radius:8px;border:none"
-                  type="submit"
-                  onclick="return confirm('Удалить статью?')">
-            Удалить
-          </button>
-        </form>
-      </div>
-    </article>
-  {% endfor %}
-</div>
-{% endblock %}
+    {% endblock %}
