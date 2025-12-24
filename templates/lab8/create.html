@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block lab %} Лабораторная работа 8 {% endblock %}
+
+{% block main %}
+  <h1>Создать статью</h1>
+
+  {% if error %}
+    <div class="error-msg">{{ error }}</div>
+  {% endif %}
+
+  <form action="/lab8/create/" method="post">
+    <div>
+      <label>Заголовок: <input type="text" name="title" value="{{ request.form.get('title') or '' }}"></label>
+    </div>
+
+    <div style="margin-top:10px;">
+      <label>Текст:</label><br>
+      <textarea name="article_text" rows="8" cols="60">{{ request.form.get('article_text') or '' }}</textarea>
+    </div>
+
+    <div style="margin-top:10px;">
+      <label><input type="checkbox" name="is_favorite" value="1"> В избранное</label>
+    </div>
+
+    <div style="margin-top:10px;">
+      <button type="submit">Сохранить</button>
+      <a href="/lab8/articles/">Отмена</a>
+    </div>
+  </form>
+{% endblock %}

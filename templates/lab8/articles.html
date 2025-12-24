@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block lab %}Лабораторная работа 8{% endblock %}
+
+{% block main %}
+<div class="container">
+  <h1 style="margin-top:0;">Мои статьи</h1>
+
+  {% if not articles %}
+    <div class="card">
+      У вас пока нет статей. <a href="/lab8/create/">Создать первую</a>
+    </div>
+  {% endif %}
+
+  {% for article in articles %}
+    <article class="article">
+      <h2>{{ article.title }}</h2>
+      <small>id: {{ article.id }}</small>
+      <blockquote>{{ article.article_text }}</blockquote>
+
+      <div style="margin-top:10px;">
+        <a class="btn ghost" href="/lab8/edit/{{ article.id }}/">Редактировать</a>
+
+        <form action="/lab8/delete/{{ article.id }}/" method="post" style="display:inline;">
+          <button class="btn"
+                  style="background:#ff6b6b;color:#fff;border-radius:8px;border:none"
+                  type="submit"
+                  onclick="return confirm('Удалить статью?')">
+            Удалить
+          </button>
+        </form>
+      </div>
+    </article>
+  {% endfor %}
+</div>
+{% endblock %}
