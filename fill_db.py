@@ -128,7 +128,6 @@ for i, book in enumerate(books_data, 1):
     title, author, publisher = book
     pages = randint(200, 1000) # Генерируем случайное кол-во страниц
     
-    # Генерация обложки с номером, чтобы визуально отличать их в интерфейсе
     cover_url = "/static/rgz/book_cover.jpg"
     
     cur.execute(

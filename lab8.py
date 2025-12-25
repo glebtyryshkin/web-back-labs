@@ -56,7 +56,7 @@ def login():
 
     user = users.query.filter_by(login=login_form).first()
     if user and check_password_hash(user.password, password_form):
-        login_user(user, remember=remember)  # remember=True сохраняет вход после закрытия браузера [web:130]
+        login_user(user, remember=remember)  # remember=True сохраняет вход после закрытия браузера
         return redirect('/lab8/')
 
     return render_template('lab8/login.html', error='Неверный логин или пароль')
