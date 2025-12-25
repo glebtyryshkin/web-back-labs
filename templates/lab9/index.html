@@ -1,9 +1,195 @@
 {% extends "base.html" %}
-
 {% block lab %}Лабораторная работа 9{% endblock %}
 
-{% block script %}{% endblock %}
-
 {% block main %}
-    <h1>Поздравления</h1>
+<style>
+  .scene {
+    position: relative;
+    min-height: 70vh;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    background: linear-gradient(180deg, #0b1d3a, #102a52 60%, #12325f);
+    overflow: hidden;
+    padding: 16px;
+    color: #fff;
+  }
+  .topbar {
+    display:flex; gap:12px; flex-wrap:wrap; align-items:center;
+    margin-bottom: 12px;
+  }
+  .pill {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.18);
+    padding: 8px 12px;
+    border-radius: 999px;
+  }
+  .btn { padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.10); color:#fff; cursor:pointer; }
+  .btn:hover { background: rgba(255,255,255,0.16); }
+
+  .box {
+    position: absolute;
+    width: 84px; height: 84px;
+    cursor: pointer;
+    user-select: none;
+    transition: transform .15s ease, filter .15s ease, opacity .2s ease;
+  }
+  .box:hover { filter: brightness(1.15); transform: translateY(-2px) scale(1.03); }
+  .box.opened { opacity: .30; cursor: not-allowed; filter: grayscale(1); }
+  .box.authonly:not(.opened) { outline: 2px dashed rgba(255,255,255,0.35); border-radius: 10px; }
+  .box img { width:100%; height:100%; object-fit: contain; }
+
+  .modal {
+    display:none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .modal.show { display:flex; }
+  .modal-card{
+    width: min(520px, 95vw);
+    background: #ffffff;
+    color: #111827;
+    border-radius: 16px;
+    padding: 18px;
+  }
+  .modal-card h2 { margin: 0 0 8px; }
+  .gift-img { width: 100%; border-radius: 12px; border: 1px solid #e5e7eb; }
+  .actions { display:flex; gap:10px; justify-content:flex-end; margin-top: 12px; }
+  .btn2 { padding: 8px 12px; border-radius: 10px; border: 1px solid #e5e7eb; background:#fff; cursor:pointer; }
+  .btn2.primary { background:#2563eb; color:#fff; border-color:#2563eb; }
+</style>
+
+<h1>Поздравления</h1>
+
+<div class="topbar">
+    <div class="pill">Открыто вами: <span id="openedCount">{{ opened_count }}</span>/3</div>
+    <div class="pill">Неоткрытых коробок: <span id="remaining">{{ remaining }}</span></div>
+
+    {% if is_auth %}
+        <button class="btn" id="santaBtn">Дед Мороз</button>
+        <div class="pill">Вы авторизованы</div>
+    {% else %}
+        <div class="pill">Вы: Anonymous</div>
+    {% endif %}
+</div>
+
+<div class="scene" id="scene">
+    {% for i in range(box_count) %}
+        {% set pos = layout[i] %}
+        <div class="box
+                    {% if opened[i] %}opened{% endif %}
+                    {% if i in auth_only %}authonly{% endif %}"
+            title="{% if i in auth_only %}Только для авторизованных{% endif %}"
+            style="left: {{ pos.x }}%; top: {{ pos.y }}%; transform: rotate({{ pos.r }}deg);"
+            data-id="{{ i }}">
+        <img src="{{ boxes[i] }}" alt="box">
+        </div>
+    {% endfor %}
+</div>
+
+<div class="modal" id="modal">
+    <div class="modal-card">
+        <h2 id="giftTitle"></h2>
+        <p id="giftText"></p>
+        <img id="giftImg" class="gift-img" alt="gift">
+        <div class="actions">
+        <button class="btn2" id="closeBtn">Закрыть</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const $ = (id) => document.getElementById(id);
+
+    const scene = $('scene');
+    const modal = $('modal');
+    const santaBtn = $('santaBtn');
+
+    const openedCountEl = $('openedCount');
+    const remainingEl = $('remaining');
+
+    const giftTitle = $('giftTitle');
+    const giftText = $('giftText');
+    const giftImg = $('giftImg');
+
+    function closeModal() {
+        modal.classList.remove('show');
+    }
+
+    function openModal(gift) {
+        giftTitle.textContent = gift.title;
+        giftText.textContent = gift.text;
+        giftImg.src = gift.img;
+        modal.classList.add('show');
+    }
+
+    function updateCounters(data) {
+        if (data.opened_count !== undefined) openedCountEl.textContent = data.opened_count;
+        if (data.remaining !== undefined) remainingEl.textContent = data.remaining;
+    }
+
+    function postJSON(url, body) {
+        return fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body)
+        }).then(res => res.json());
+    }
+
+    function postEmpty(url) {
+        return fetch(url, { method: 'POST' }).then(res => res.json());
+    }
+
+    // закрытие модалки
+    $('closeBtn').addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+    // клик по коробкам (делегирование событий) [web:416]
+    scene.addEventListener('click', (e) => {
+        const box = e.target.closest('.box');
+        if (!box) return;
+        if (box.classList.contains('opened')) return;
+
+        const id = Number(box.dataset.id);
+
+        postJSON('/lab9/api/open', { box_id: id })
+        .then(data => {
+            if (!data.ok) {
+            alert(data.error);
+            updateCounters(data);
+            return;
+            }
+
+            box.classList.add('opened');
+            updateCounters(data);
+            openModal(data.gift);
+        })
+        .catch(() => {
+            alert('Ошибка связи с сервером');
+        });
+    });
+
+    // кнопка "Дед Мороз"
+    if (santaBtn) {
+        santaBtn.addEventListener('click', () => {
+        postEmpty('/lab9/api/santa')
+            .then(data => {
+            if (!data.ok) {
+                alert(data.error);
+                return;
+            }
+
+            document.querySelectorAll('.box').forEach(b => b.classList.remove('opened'));
+            updateCounters(data);
+            alert('Дед Мороз наполнил все коробки заново!');
+            })
+            .catch(() => {
+            alert('Ошибка связи с сервером');
+            });
+        });
+    }
+</script>
+
+
 {% endblock %}
